@@ -8,3 +8,7 @@ Requires running as sudo or root
 -q: Shows the current brightness
 
 -s [float between 0-100]: sets the brightness
+# Installation
+use clang or g++ to compile main.cpp
+
+move to /usr/local/bin/ or /usr/bin/ directories to use
