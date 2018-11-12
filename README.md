@@ -5,8 +5,7 @@ Requires running as sudo or root
 
 # Options
 
--q: Shows the current brightness
-
+-q: Shows the current brightness\n
 -s [float between 0-100]: sets the brightness
 # Installation
 use clang or g++ to compile main.cpp
