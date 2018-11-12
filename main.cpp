@@ -57,26 +57,15 @@ int main(int argc, char **argv)
 	int option = -1, i_pct;
 	float pct_b, cur_b, max_b;
 	char *cvalue = NULL;
-/*	
-	if(argc <= 1)
-	{
-		cout << "ERROR: NOT ENOUGH ARGUMENTS" << endl
-			 << "MUST HAVE AT LEAST ONE ARGUMENT" << endl;
-		return 0;
-	}
-
-	if(geteuid() != 0)
-	{
-		cout << "MUST BE ROOT" << endl;
-		return -1;
-	}
-*/
+	bool inc = false;
+	bool dec = false;
+	bool set = false;
 	checkUse(argc);
 	istringstream(checkOutput("cat /sys/class/backlight/intel_backlight/max_brightness")) >> max_b;
 	istringstream(checkOutput("cat /sys/class/backlight/intel_backlight/brightness")) >> cur_b;
 	pct_b = cur_b*100/max_b;
 	
-	while ((option = getopt(argc, argv, "s:q")) != -1)
+	while ((option = getopt(argc, argv, "i:d:s:q")) != -1)
 	{
 		switch (option)
 		{
@@ -89,18 +78,55 @@ int main(int argc, char **argv)
 
 			case 's':
 				cvalue = optarg;
+				set = true;
+				break;
+			case 'i':
+				cvalue = optarg;
+				inc = true;
+				break;
+			case 'd':
+				cvalue = optarg;
+				dec = true;
 				break;
 		}
 	}
 
-	if (!(atof(cvalue) > 100) && !(atof(cvalue) <= 0))
+	if(inc)
 	{
-		i_pct = (atof(cvalue)/100) * max_b;
+		pct_b = atof(cvalue)/100 * max_b;
+		//cout << "INC BY: " << pct_b << endl;
+		cur_b += pct_b;
+		if((int)cur_b > max_b)
+			cur_b = max_b;
+		//cout << "INC BY: " << (int)cur_b << endl;
 		fstream file;
 		file.open("/sys/class/backlight/intel_backlight/brightness", ios::out);
-		file << to_string(i_pct) << endl;
-	}else{
-		cout << cvalue << " is not between 0 and 100" << endl;
-		return 0;
+                file << to_string((int)cur_b) << endl;
+
+	}
+
+	if(dec)
+	{
+		pct_b = atof(cvalue)/100 * max_b;
+		//cout << "DEC BY: " << pct_b << endl;
+		cur_b -= pct_b;
+		fstream file;
+		file.open("/sys/class/backlight/intel_backlight/brightness", ios::out);
+		file << to_string((int)cur_b) << endl;
+	}
+
+	if(set)
+	{
+		if (!(atof(cvalue) > 100) && !(atof(cvalue) <= 0))
+		{
+			i_pct = (atof(cvalue)/100) * max_b;
+			fstream file;
+			file.open("/sys/class/backlight/intel_backlight/brightness", ios::out);
+			file << to_string(i_pct) << endl;
+		}else{
+			cout << cvalue << " is not between 0 and 100" << endl;
+			return 0;
+		}
+
 	}
 }
