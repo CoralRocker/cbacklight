@@ -2,14 +2,20 @@
  * Author: Gaultier Delbarre
  * Written: 2018
  * BLIGHT --------
- * A program to change the screen brightness of linux and linux-based systems. Written in C++.
- * Uses fstreams to write to file. Must be run as root or sudo.
+ * A program to change the backlight strength of systems which store backlight info in the 
+ * /sys/class/intel_backlight/ directory. Written in C++. Uses fstreams to write to file. 
+ * Must be run as root or sudo, as it modifies files in /sys/class. Am working on an 
+ * implementation in C, and am cleaning up the mess of code which is this project. 
  *
  * USAGE ---------
  * To set brightness
  * 	->blight -s [brightness percent]
  * To find the current brightness
  * 	->blight -q
+ * To increment brightness
+ * 	->blight -i [percent]
+ * To decrement brightness
+ * 	->blight -d [percent]
  *
  * Must be run with an argument.
  */
@@ -41,11 +47,10 @@ int checkUse(int args)
 string checkOutput(string cmd)
 {
 	FILE *fp;
-	//cmd.append(" 2&>1");
-	char var[40];
+	char var[16];
 	string data;
 	fp = popen(cmd.c_str(), "r");
-	while (fgets(var, 40, fp) != NULL)
+	while (fgets(var, 16, fp) != NULL)
 	{
 		data.append(var);
 	}
@@ -71,7 +76,7 @@ int main(int argc, char **argv)
 		{
 			case 'q':
 				cout << "Current Brightness: " << cur_b << endl 
-					 << "Maximum Brightness: " << max_b << endl
+					<< "Maximum Brightness: " << max_b << endl
 					 << "Percent Brightness: " << pct_b << "%" << endl;
 				return 0;
 				break;
